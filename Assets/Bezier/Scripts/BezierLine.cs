@@ -1,60 +1,62 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Kilosoft.Tools;
 using UnityEditor;
-
-public class BezierLine : MonoBehaviour
+using Kilosoft.Tools;
+namespace BezierScripts
 {
-    private BezierSegment[] _segments;
-    public int SegmentsNums
+    public class BezierLine : MonoBehaviour
     {
-        get
+        [SerializeField] [HideInInspector] private BezierSegment[] _segments;
+        public int SegmentsNums
         {
-            return _segments.Length;
-        }
-    }
-    private GameObject _segmentsGameObject;
-    [SerializeField] private Transform[] _points;
-
-    [EditorButton("ApplyPoints")]
-    public void ApplyPoints()
-    {
-        if (_points.Length != 0)
-        {
-            if(_segments != null)
+            get
             {
-                foreach(var segment in _segments)
+                return _segments.Length;
+            }
+        }
+        private GameObject _segmentsGameObject;
+        [SerializeField] private Transform[] _points;
+
+        [EditorButton("ApplyPoints")]
+        public void ApplyPoints()
+        {
+            if (_points.Length != 0)
+            {
+                if (_segments != null)
                 {
+                    foreach (var segment in _segments)
+                    {
                         segment.Clear();
-                    DestroyImmediate(segment.gameObject);
+                        DestroyImmediate(segment.gameObject);
+                    }
+                    DestroyImmediate(_segmentsGameObject);
                 }
-                DestroyImmediate(_segmentsGameObject);
-            }
-            _segments = new BezierSegment[_points.Length - 1];
-            _segmentsGameObject = new GameObject("Segments");
-            _segmentsGameObject.transform.parent = transform;
+                _segments = new BezierSegment[_points.Length - 1];
+                _segmentsGameObject = new GameObject("Segments");
+                _segmentsGameObject.transform.parent = transform;
 
-            for (int i = 0; i < _points.Length - 1; i++)
-            {
-                var segment = new GameObject("Segment " + (i).ToString());
-                segment.transform.position = _points[i].transform.position;
-                segment.AddComponent<BezierSegment>();
-                var bezierSegment = segment.GetComponent<BezierSegment>();
-                bezierSegment.InitializeSegment(_points[i], _points[i + 1]);
-                segment.transform.parent = _segmentsGameObject.transform;
-                _segments[i] = bezierSegment;
+                for (int i = 0; i < _points.Length - 1; i++)
+                {
+                    var segment = new GameObject("Segment " + (i).ToString());
+                    segment.transform.position = _points[i].transform.position;
+                    segment.AddComponent<BezierSegment>();
+                    var bezierSegment = segment.GetComponent<BezierSegment>();
+                    bezierSegment.InitializeSegment(_points[i], _points[i + 1]);
+                    segment.transform.parent = _segmentsGameObject.transform;
+                    _segments[i] = bezierSegment;
+                }
             }
         }
-    }
-    public Vector3 GetPointToSegmentIndex(int segmentIndex, float capacity)
-    {
-        var result = _segments[segmentIndex].GetPoint(capacity);
-        return result;
-    }
-    public Vector3 GetRotationToSegmentIndex(int segmentIndex, float capacity)
-    {
-        var result = _segments[segmentIndex].GetRotation(capacity);
-        return result;
+        public Vector3 GetPointToSegmentIndex(int segmentIndex, float capacity)
+        {
+            var result = _segments[segmentIndex].GetPoint(capacity);
+            return result;
+        }
+        public Vector3 GetRotationToSegmentIndex(int segmentIndex, float capacity)
+        {
+            var result = _segments[segmentIndex].GetRotation(capacity);
+            return result;
+        }
     }
 }
