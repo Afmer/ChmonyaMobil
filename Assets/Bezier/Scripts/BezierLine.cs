@@ -8,6 +8,8 @@ namespace BezierScripts
     public class BezierLine : MonoBehaviour
     {
         [SerializeField] [HideInInspector] private BezierSegment[] _segments;
+        [SerializeField][HideInInspector] private GameObject _segmentsGameObject;
+        [SerializeField] private Transform[] _points;
         public int SegmentsNums
         {
             get
@@ -15,8 +17,6 @@ namespace BezierScripts
                 return _segments.Length;
             }
         }
-        private GameObject _segmentsGameObject;
-        [SerializeField] private Transform[] _points;
 
         [EditorButton("ApplyPoints")]
         public void ApplyPoints()
@@ -27,14 +27,21 @@ namespace BezierScripts
                 {
                     foreach (var segment in _segments)
                     {
-                        segment.Clear();
-                        DestroyImmediate(segment.gameObject);
+                        if (segment != null)
+                        {
+                            segment.Clear();
+                            DestroyImmediate(segment.gameObject);
+                        }
                     }
                     DestroyImmediate(_segmentsGameObject);
                 }
                 _segments = new BezierSegment[_points.Length - 1];
                 _segmentsGameObject = new GameObject("Segments");
                 _segmentsGameObject.transform.parent = transform;
+                for(int i = 0; i < _points.Length; i++)
+                {
+                    ClearPointClidrens(_points[i]);
+                }
 
                 for (int i = 0; i < _points.Length - 1; i++)
                 {
@@ -48,6 +55,35 @@ namespace BezierScripts
                 }
             }
         }
+
+        [EditorButton("DeleteLine")]
+        public void DeleteLine()
+        {
+            if (_segments != null)
+            {
+                for (int i = 0; i < _segments.Length; i++)
+                {
+                    if (_segments[i] != null)
+                    {
+                        _segments[i].Clear();
+                        DestroyImmediate(_segments[i]);
+                    }
+                }
+                _segments = null;
+            }
+            if (_segmentsGameObject != null)
+            {
+                DestroyImmediate(_segmentsGameObject);
+                _segmentsGameObject = null;
+            }
+            if(_points != null)
+            {
+                for(int i = 0; i < _points.Length; i++)
+                {
+                    EditorGUIUtility.SetIconForObject(_points[i].gameObject, null);
+                }
+            }
+        }
         public Vector3 GetPointToSegmentIndex(int segmentIndex, float capacity)
         {
             var result = _segments[segmentIndex].GetPoint(capacity);
@@ -57,6 +93,14 @@ namespace BezierScripts
         {
             var result = _segments[segmentIndex].GetRotation(capacity);
             return result;
+        }
+        private void ClearPointClidrens(Transform point)
+        {
+            int childCount = point.childCount;
+            for(int i = 0; i < childCount; i++)
+            {
+                DestroyImmediate(point.GetChild(i).gameObject);
+            }
         }
     }
 }
