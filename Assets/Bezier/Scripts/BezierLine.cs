@@ -27,14 +27,21 @@ namespace BezierScripts
                 {
                     foreach (var segment in _segments)
                     {
-                        segment.Clear();
-                        DestroyImmediate(segment.gameObject);
+                        if (segment != null)
+                        {
+                            segment.Clear();
+                            DestroyImmediate(segment.gameObject);
+                        }
                     }
                     DestroyImmediate(_segmentsGameObject);
                 }
                 _segments = new BezierSegment[_points.Length - 1];
                 _segmentsGameObject = new GameObject("Segments");
                 _segmentsGameObject.transform.parent = transform;
+                for(int i = 0; i < _points.Length; i++)
+                {
+                    ClearPointClidrens(_points[i]);
+                }
 
                 for (int i = 0; i < _points.Length - 1; i++)
                 {
@@ -86,6 +93,14 @@ namespace BezierScripts
         {
             var result = _segments[segmentIndex].GetRotation(capacity);
             return result;
+        }
+        private void ClearPointClidrens(Transform point)
+        {
+            int childCount = point.childCount;
+            for(int i = 0; i < childCount; i++)
+            {
+                DestroyImmediate(point.GetChild(i).gameObject);
+            }
         }
     }
 }
