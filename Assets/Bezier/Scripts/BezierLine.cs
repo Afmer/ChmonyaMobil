@@ -8,6 +8,8 @@ namespace BezierScripts
     public class BezierLine : MonoBehaviour
     {
         [SerializeField] [HideInInspector] private BezierSegment[] _segments;
+        [SerializeField][HideInInspector] private GameObject _segmentsGameObject;
+        [SerializeField] private Transform[] _points;
         public int SegmentsNums
         {
             get
@@ -15,8 +17,6 @@ namespace BezierScripts
                 return _segments.Length;
             }
         }
-        private GameObject _segmentsGameObject;
-        [SerializeField] private Transform[] _points;
 
         [EditorButton("ApplyPoints")]
         public void ApplyPoints()
