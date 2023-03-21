@@ -48,6 +48,35 @@ namespace BezierScripts
                 }
             }
         }
+
+        [EditorButton("DeleteLine")]
+        public void DeleteLine()
+        {
+            if (_segments != null)
+            {
+                for (int i = 0; i < _segments.Length; i++)
+                {
+                    if (_segments[i] != null)
+                    {
+                        _segments[i].Clear();
+                        DestroyImmediate(_segments[i]);
+                    }
+                }
+                _segments = null;
+            }
+            if (_segmentsGameObject != null)
+            {
+                DestroyImmediate(_segmentsGameObject);
+                _segmentsGameObject = null;
+            }
+            if(_points != null)
+            {
+                for(int i = 0; i < _points.Length; i++)
+                {
+                    EditorGUIUtility.SetIconForObject(_points[i].gameObject, null);
+                }
+            }
+        }
         public Vector3 GetPointToSegmentIndex(int segmentIndex, float capacity)
         {
             var result = _segments[segmentIndex].GetPoint(capacity);

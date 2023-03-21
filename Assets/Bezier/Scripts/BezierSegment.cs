@@ -5,6 +5,7 @@ using UnityEditor;
 using UnityEngine;
 namespace BezierScripts
 {
+    [ExecuteAlways]
     public class BezierSegment : MonoBehaviour
     {
 
@@ -69,6 +70,18 @@ namespace BezierScripts
         }
 
         public void Clear()
+        {
+            if (_P1 != null) DestroyImmediate(_P1.gameObject);
+            if (_P2 != null) DestroyImmediate(_P2.gameObject);
+            EditorGUIUtility.SetIconForObject(_P3.gameObject, null);
+            EditorGUIUtility.SetIconForObject(_P0.gameObject, null);
+            _P0 = null;
+            _P1 = null;
+            _P2 = null;
+            _P3 = null;
+        }
+
+        private void OnDestroy()
         {
             if (_P1 != null) DestroyImmediate(_P1.gameObject);
             if (_P2 != null) DestroyImmediate(_P2.gameObject);
