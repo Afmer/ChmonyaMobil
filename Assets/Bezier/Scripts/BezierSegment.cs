@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 namespace BezierScripts
 {
-    [ExecuteAlways]
+    [ExecuteInEditMode]
     public class BezierSegment : MonoBehaviour
     {
 
@@ -79,12 +79,6 @@ namespace BezierScripts
             _P1 = null;
             _P2 = null;
             _P3 = null;
-        }
-
-        private void OnDestroy()
-        {
-            if (_P1 != null) DestroyImmediate(_P1.gameObject);
-            if (_P2 != null) DestroyImmediate(_P2.gameObject);
         }
     }
 }
