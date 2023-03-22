@@ -24,7 +24,7 @@ namespace OmniRobot
                 else throw new System.Exception("Robot is moving now");
             }
         }
-        private BezierLine _bezierLine;
+        [SerializeField] private BezierLine _bezierLine;
         private bool _isMoving = false;
         [EditorButton("Move")]
         public void Move()
@@ -44,13 +44,19 @@ namespace OmniRobot
         {
             for(int i = 0; i < BezierLine.SegmentsNums; i++)
             {
-                float angle;
+                float angle, bezierAngle, transformAngle;
                 for(float j = 0; j < 1; j += _step)
                 {
                     MoveToPoint(BezierLine.GetPointToSegmentIndex(i, j));
                     while(IsMovingToPoint)
                         yield return null;
-                    angle = BezierLine.GetRotationToSegmentIndex(i, j).y - transform.eulerAngles.y;
+                    bezierAngle = Quaternion.LookRotation(BezierLine.GetRotationToSegmentIndex(i, j)).eulerAngles.y;
+                    if (bezierAngle > 180)
+                        bezierAngle -= 360;
+                    transformAngle = transform.eulerAngles.y;
+                    if (transformAngle > 180)
+                        transformAngle -= 360;
+                    angle = bezierAngle - transformAngle;
                     _movementLogic.Rotate(angle);
                     while(_movementLogic.IsRotationCoroutineActive)
                         yield return null;
@@ -58,7 +64,13 @@ namespace OmniRobot
                 MoveToPoint(BezierLine.GetPointToSegmentIndex(i, 1));
                 while (IsMovingToPoint)
                     yield return null;
-                angle = BezierLine.GetRotationToSegmentIndex(i, 1).y - transform.eulerAngles.y;
+                bezierAngle = Quaternion.LookRotation(BezierLine.GetRotationToSegmentIndex(i, 1)).eulerAngles.y;
+                if (bezierAngle > 180)
+                    bezierAngle -= 360;
+                transformAngle = transform.eulerAngles.y;
+                if (transformAngle > 180)
+                    transformAngle -= 360;
+                angle = bezierAngle - transformAngle;
                 _movementLogic.Rotate(angle);
                 while (_movementLogic.IsRotationCoroutineActive)
                     yield return null;
