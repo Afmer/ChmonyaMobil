@@ -14,7 +14,7 @@ namespace BezierScripts
         [SerializeField][HideInInspector] private Transform _P2;
         [SerializeField][HideInInspector] private Transform _P3;
 
-        public Vector2 GetPoint(float t)
+        public Vector3 GetPoint(float t)
         {
             if (t > 1 && t < 0)
                 throw new System.Exception("Incorrect T parameter");
