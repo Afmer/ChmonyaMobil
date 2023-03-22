@@ -22,6 +22,7 @@ namespace OmniRobot
                 return new Vector2(0, 1);
             }
         }
+        public bool IsMovingToPoint { get; private set; } = false;
         [SerializeField] private MovementLogic _movementLogic;
         private Transform _targetTransform;
         protected Vector2 _targetVector
@@ -46,28 +47,33 @@ namespace OmniRobot
 
         protected void MoveToPoint(Transform target)
         {
-            _targetTransform = target;
-            var angle = GetAngleDegreesBetweenVectors(_forwardDirectionVector, _basisX) - GetAngleDegreesBetweenVectors(_targetVector.normalized, _basisX);
-            //var angle = RadiansToDegrees(Mathf.Atan((TargetVector.x - _forwardDirectionVector.x) / (TargetVector.y - _forwardDirectionVector.y)));
-            _movementLogic.Rotate(angle);
-            float acceleration = _movementLogic.Strength / _movementLogic.Mass;
-            float brakeAcceleration = _movementLogic.FrictionCoef * 9.8f;
-            float timeForAcceleration = _movementLogic.MaxSpeed / acceleration;
-            float timeBrake = _movementLogic.MaxSpeed / brakeAcceleration;
-            float accelerationPath = (acceleration * timeForAcceleration * timeForAcceleration) / 2;
-            float brakePath = _movementLogic.MaxSpeed * timeBrake + ((brakeAcceleration * timeBrake * timeBrake) / 2);
-            float path = _targetVector.magnitude;
-            path -= (accelerationPath + brakePath);
-            if (path >= 0)
+            if (!IsMovingToPoint)
             {
-                float time = path / _movementLogic.MaxSpeed;
-                float activeTime = timeForAcceleration + time;
-                StartCoroutine(WaitingRotation(activeTime));
+                IsMovingToPoint= true;
+                _targetTransform = target;
+                var angle = GetAngleDegreesBetweenVectors(_forwardDirectionVector, _basisX) - GetAngleDegreesBetweenVectors(_targetVector.normalized, _basisX);
+                //var angle = RadiansToDegrees(Mathf.Atan((TargetVector.x - _forwardDirectionVector.x) / (TargetVector.y - _forwardDirectionVector.y)));
+                _movementLogic.Rotate(angle);
+                float acceleration = _movementLogic.Strength / _movementLogic.Mass;
+                float brakeAcceleration = _movementLogic.FrictionCoef * 9.8f;
+                float timeForAcceleration = _movementLogic.MaxSpeed / acceleration;
+                float timeBrake = _movementLogic.MaxSpeed / brakeAcceleration;
+                float accelerationPath = (acceleration * timeForAcceleration * timeForAcceleration) / 2;
+                float brakePath = _movementLogic.MaxSpeed * timeBrake + ((brakeAcceleration * timeBrake * timeBrake) / 2);
+                float path = _targetVector.magnitude;
+                path -= (accelerationPath + brakePath);
+                if (path >= 0)
+                {
+                    float time = path / _movementLogic.MaxSpeed;
+                    float activeTime = timeForAcceleration + time;
+                    StartCoroutine(WaitingRotation(activeTime));
+                }
+                else
+                {
+                    StartCoroutine(WaitingRotation());
+                }
             }
-            else
-            {
-                StartCoroutine(WaitingRotation());
-            }
+            else throw new Exception("Move is active");
         }
 
         private IEnumerator MoveCoroutine(float time)
@@ -80,6 +86,7 @@ namespace OmniRobot
                 _movementLogic.StrengthDirection = new Vector3(0, 0, 1);
             }
             _movementLogic.StrengthDirection = new Vector3(0, 0, 0);
+            IsMovingToPoint = false;
             yield break;
         }
 
@@ -100,6 +107,7 @@ namespace OmniRobot
                 residualPath -= _movementLogic.SpeedVector.magnitude * Time.deltaTime;
             }
             _movementLogic.StrengthDirection = new Vector3(0, 0, 0);
+            IsMovingToPoint = false;
             yield break;
         }
 
