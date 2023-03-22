@@ -44,7 +44,7 @@ public class MovePoint : MonoBehaviour
         return radians * 57.2956f;
     }
 
-    public void MoveToPoint(Transform target)
+    protected void MoveToPoint(Transform target)
     {
         _targetTransform = target;
         var angle = GetAngleDegreesBetweenVectors(_forwardDirectionVector, _basisX) - GetAngleDegreesBetweenVectors(_targetVector.normalized, _basisX);
