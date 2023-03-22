@@ -7,23 +7,7 @@ namespace OmniRobot
 {
     public abstract class MovePoint : MonoBehaviour
     {
-        [SerializeField] private Transform _forwardPoint;
         protected Vector3 _targetPosition { get; private set; }
-        private Vector2 _basisX
-        {
-            get
-            {
-                return transform.TransformVector(new Vector2(1, 0));
-            }
-        }
-        protected Vector2 _forwardDirectionVector
-        {
-            get
-            {
-                Vector3 point = _forwardPoint.position - transform.position;
-                return new Vector2(point.x, point.z);
-            }
-        }
         public bool IsMovingToPoint { get; private set; } = false;
         [SerializeField] protected MovementLogic _movementLogic;
         protected Vector2 _targetVector
@@ -52,7 +36,12 @@ namespace OmniRobot
             {
                 IsMovingToPoint= true;
                 _targetPosition = target;
-                var angle = GetAngleDegreesBetweenVectors(_forwardDirectionVector, _basisX) - GetAngleDegreesBetweenVectors(_targetVector.normalized, _basisX);
+                var tempTargetVectorLocal = transform.InverseTransformVector(new Vector3(_targetVector.x, 0, _targetVector.y));
+                var targetDirectionLocal = new Vector2(tempTargetVectorLocal.x, tempTargetVectorLocal.z);
+                var forwardDirectionLocal = new Vector2(0, 1);
+                var angle = GetAngleDegreesBetweenVectors(targetDirectionLocal, forwardDirectionLocal);
+                if (targetDirectionLocal.x < 0)
+                    angle *= -1;
                 //var angle = RadiansToDegrees(Mathf.Atan((TargetVector.x - _forwardDirectionVector.x) / (TargetVector.y - _forwardDirectionVector.y)));
                 _movementLogic.Rotate(angle);
                 float acceleration = _movementLogic.Strength / _movementLogic.Mass;
