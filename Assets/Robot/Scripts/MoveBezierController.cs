@@ -7,17 +7,22 @@ namespace OmniRobot
 {
     public class MoveBezierController : MovePoint
     {
-        [SerializeField] private BezierLine _bezierLine;
-        // Start is called before the first frame update
-        void Start()
+        public BezierLine BezierLine
         {
-
+            get
+            {
+                return _bezierLine;
+            }
+            set
+            {
+                if (!_isMoving)
+                {
+                    _bezierLine = value;
+                }
+                else throw new System.Exception("Robot is moving now");
+            }
         }
-
-        // Update is called once per frame
-        void Update()
-        {
-
-        }
+        private BezierLine _bezierLine;
+        private bool _isMoving = false;
     }
 }
