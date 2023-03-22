@@ -7,13 +7,21 @@ namespace OmniRobot
 {
     public abstract class MovePoint : MonoBehaviour
     {
+        [SerializeField] private Transform _forwardPoint;
         protected Vector3 _targetPosition { get; private set; }
-        private Vector2 _basisX = new Vector2(1, 0);
+        private Vector2 _basisX
+        {
+            get
+            {
+                return transform.TransformVector(new Vector2(1, 0));
+            }
+        }
         protected Vector2 _forwardDirectionVector
         {
             get
             {
-                return new Vector2(0, 1);
+                Vector3 point = _forwardPoint.position - transform.position;
+                return new Vector2(point.x, point.z);
             }
         }
         public bool IsMovingToPoint { get; private set; } = false;
