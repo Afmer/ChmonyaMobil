@@ -6,16 +6,16 @@ using System;
 
 public class MovePoint : MonoBehaviour
 {
-    private Vector3 _targetPosition
+    protected Vector3 _targetPosition
     {
         get
         {
-            return TargetTransform.position;
+            return _targetTransform.position;
         }
     }
     private Vector2 _basisX = new Vector2(1, 0);
     private bool temp = true;
-    private Vector2 _forwardDirectionVector
+    protected Vector2 _forwardDirectionVector
     {
         get
         {
@@ -23,28 +23,15 @@ public class MovePoint : MonoBehaviour
         }
     }
     [SerializeField] private MovementLogic _movementLogic;
-    [SerializeField] public Transform TargetTransform;
-    public Vector2 TargetVector
+    private Transform _targetTransform;
+    protected Vector2 _targetVector
     {
         get
         {
             return new Vector2(_targetPosition.x - transform.position.x, _targetPosition.z - transform.position.z);
         }
     }
-    void Start()
-    {
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        if (temp)
-        {
-            MoveToPoint();
-            //_movementLogic.Rotate(-90);
-            temp = false;
-        }
-    }
 
     private float GetAngleDegreesBetweenVectors(Vector2 direction, Vector2 targetVector)
     {
@@ -52,14 +39,15 @@ public class MovePoint : MonoBehaviour
         return RadiansToDegrees(Mathf.Acos(cos));
     }
 
-    private float RadiansToDegrees(float radians)
+    protected float RadiansToDegrees(float radians)
     {
         return radians * 57.2956f;
     }
 
-    public void MoveToPoint()
+    public void MoveToPoint(Transform target)
     {
-        var angle = GetAngleDegreesBetweenVectors(_forwardDirectionVector, _basisX) - GetAngleDegreesBetweenVectors(TargetVector.normalized, _basisX);
+        _targetTransform = target;
+        var angle = GetAngleDegreesBetweenVectors(_forwardDirectionVector, _basisX) - GetAngleDegreesBetweenVectors(_targetVector.normalized, _basisX);
         //var angle = RadiansToDegrees(Mathf.Atan((TargetVector.x - _forwardDirectionVector.x) / (TargetVector.y - _forwardDirectionVector.y)));
         _movementLogic.Rotate(angle);
         float acceleration = _movementLogic.Strength / _movementLogic.Mass;
@@ -68,7 +56,7 @@ public class MovePoint : MonoBehaviour
         float timeBrake = _movementLogic.MaxSpeed / brakeAcceleration;
         float accelerationPath = (acceleration * timeForAcceleration * timeForAcceleration) / 2;
         float brakePath = _movementLogic.MaxSpeed * timeBrake + ((brakeAcceleration * timeBrake * timeBrake) / 2);
-        float path = TargetVector.magnitude;
+        float path = _targetVector.magnitude;
         path -= (accelerationPath + brakePath);
         if (path >= 0)
         {
@@ -97,7 +85,7 @@ public class MovePoint : MonoBehaviour
 
     private IEnumerator ShortMoveCoroutine()
     {
-        float residualPath = TargetVector.magnitude;
+        float residualPath = _targetVector.magnitude;
         float brakeAcceleration = _movementLogic.FrictionCoef * 9.8f;
         Func<bool> isNeedToStop = () =>
         {
