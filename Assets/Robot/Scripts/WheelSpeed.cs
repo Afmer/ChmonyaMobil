@@ -1,13 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public class WheelSpeed : MonoBehaviour
+namespace OmniRobot
 {
-    public float AngleSpeed;
-
-    private void FixedUpdate()
+    public class WheelSpeed : MonoBehaviour
     {
-        transform.Rotate(new Vector3(0, 0, AngleSpeed) * Time.deltaTime, Space.Self);
+        public float AngleSpeed;
+
+        private void FixedUpdate()
+        {
+            transform.Rotate(new Vector3(0, 0, AngleSpeed) * Time.deltaTime, Space.Self);
+        }
     }
 }

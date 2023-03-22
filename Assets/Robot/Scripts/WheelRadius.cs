@@ -1,14 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public class WheelRadius : MonoBehaviour
+namespace OmniRobot
 {
-    [SerializeField] private Transform _endPoint;
-    public float Radius { get; private set; }
-
-    private void Awake()
+    public class WheelRadius : MonoBehaviour
     {
-        Radius = (_endPoint.position - transform.position).magnitude;
+        [SerializeField] private Transform _endPoint;
+        public float Radius { get; private set; }
+
+        private void Awake()
+        {
+            Radius = (_endPoint.position - transform.position).magnitude;
+        }
     }
 }
