@@ -7,13 +7,7 @@ namespace OmniRobot
 {
     public abstract class MovePoint : MonoBehaviour
     {
-        protected Vector3 _targetPosition
-        {
-            get
-            {
-                return _targetTransform.position;
-            }
-        }
+        protected Vector3 _targetPosition { get; private set; }
         private Vector2 _basisX = new Vector2(1, 0);
         protected Vector2 _forwardDirectionVector
         {
@@ -23,8 +17,7 @@ namespace OmniRobot
             }
         }
         public bool IsMovingToPoint { get; private set; } = false;
-        [SerializeField] private MovementLogic _movementLogic;
-        private Transform _targetTransform;
+        [SerializeField] protected MovementLogic _movementLogic;
         protected Vector2 _targetVector
         {
             get
@@ -45,12 +38,12 @@ namespace OmniRobot
             return radians * 57.2956f;
         }
 
-        protected void MoveToPoint(Transform target)
+        protected void MoveToPoint(Vector3 target)
         {
             if (!IsMovingToPoint)
             {
                 IsMovingToPoint= true;
-                _targetTransform = target;
+                _targetPosition = target;
                 var angle = GetAngleDegreesBetweenVectors(_forwardDirectionVector, _basisX) - GetAngleDegreesBetweenVectors(_targetVector.normalized, _basisX);
                 //var angle = RadiansToDegrees(Mathf.Atan((TargetVector.x - _forwardDirectionVector.x) / (TargetVector.y - _forwardDirectionVector.y)));
                 _movementLogic.Rotate(angle);
