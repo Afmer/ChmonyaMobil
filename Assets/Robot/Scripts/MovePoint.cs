@@ -19,11 +19,10 @@ public class MovePoint : MonoBehaviour
     {
         get
         {
-            return new Vector2(_forwardDirection.position.x - transform.position.x, _forwardDirection.position.z - transform.position.z).normalized;
+            return new Vector2(0, 1);
         }
     }
     [SerializeField] private MovementLogic _movementLogic;
-    [SerializeField] private Transform _forwardDirection;
     [SerializeField] public Transform TargetTransform;
     public Vector2 TargetVector
     {
