@@ -4,7 +4,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using System;
 
-public class MovePoint : MonoBehaviour
+public abstract class MovePoint : MonoBehaviour
 {
     protected Vector3 _targetPosition
     {
