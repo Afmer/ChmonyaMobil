@@ -15,7 +15,6 @@ namespace OmniRobot
             }
         }
         private Vector2 _basisX = new Vector2(1, 0);
-        private bool temp = true;
         protected Vector2 _forwardDirectionVector
         {
             get
