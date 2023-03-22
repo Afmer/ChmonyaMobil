@@ -2,6 +2,7 @@ using BezierScripts;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Kilosoft.Tools;
 
 namespace OmniRobot
 {
@@ -24,5 +25,13 @@ namespace OmniRobot
         }
         private BezierLine _bezierLine;
         private bool _isMoving = false;
+        [EditorButton("Move")]
+        public void Move()
+        {
+            if(Application.isPlaying)
+            {
+
+            }
+        }
     }
 }
