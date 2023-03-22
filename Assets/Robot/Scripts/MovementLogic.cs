@@ -138,45 +138,45 @@ namespace OmniRobot
 
         private IEnumerator RotateCoroutine(float degrees)
         {
-            if (!IsRotationCoroutineActive)
-            {
-                float currentRotation = 0;
-                float direction = degrees / Mathf.Abs(degrees);
-                float rotation;
-                _rotationVector = new Vector3(0, direction, 0);
-                Func<float, float, bool> boolFunc;
-                if (degrees >= 0)
-                    boolFunc = (currentRotation, degrees) => { return currentRotation < degrees; };
-                else
-                    boolFunc = (currentRotation, degrees) => { return currentRotation > degrees; };
-                while (boolFunc(currentRotation, degrees))
-                {
-                    yield return null;
-                    rotation = direction * AngleSpeed * Time.deltaTime;
-                    if (boolFunc(currentRotation + rotation, degrees))
-                    {
-                        currentRotation += rotation;
-                        transform.Rotate(new Vector3(0, rotation, 0));
-                    }
-                    else
-                    {
-                        var finalRotation = degrees - currentRotation;
-                        transform.Rotate(new Vector3(0, finalRotation, 0));
-                        currentRotation = degrees;
-                    }
-                }
-                IsRotationCoroutineActive = false;
-                _rotationVector = new Vector3();
-                yield break;
-            }
+            float currentRotation = 0;
+            float direction = degrees / Mathf.Abs(degrees);
+            float rotation;
+            _rotationVector = new Vector3(0, direction, 0);
+            Func<float, float, bool> boolFunc;
+            if (degrees >= 0)
+                boolFunc = (currentRotation, degrees) => { return currentRotation < degrees; };
             else
-                throw new System.Exception("Rotation coroutine is active");
+                boolFunc = (currentRotation, degrees) => { return currentRotation > degrees; };
+            while (boolFunc(currentRotation, degrees))
+            {
+                yield return null;
+                rotation = direction * AngleSpeed * Time.deltaTime;
+                if (boolFunc(currentRotation + rotation, degrees))
+                {
+                    currentRotation += rotation;
+                    transform.Rotate(new Vector3(0, rotation, 0));
+                }
+                else
+                {
+                    var finalRotation = degrees - currentRotation;
+                    transform.Rotate(new Vector3(0, finalRotation, 0));
+                    currentRotation = degrees;
+                }
+            }
+            IsRotationCoroutineActive = false;
+            _rotationVector = new Vector3();
+            yield break;
         }
 
         public void Rotate(float degrees)
         {
-            IsRotationCoroutineActive = true;
-            StartCoroutine(RotateCoroutine(degrees));
+            if (!IsRotationCoroutineActive)
+            {
+                IsRotationCoroutineActive = true;
+                StartCoroutine(RotateCoroutine(degrees));
+            }
+            else
+                throw new System.Exception("Rotation coroutine is active");
         }
 
         private void RotationLogicFunc()
