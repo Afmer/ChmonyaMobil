@@ -141,7 +141,6 @@ namespace OmniRobot
             if (!IsRotationCoroutineActive)
             {
                 float currentRotation = 0;
-                IsRotationCoroutineActive = true;
                 float direction = degrees / Mathf.Abs(degrees);
                 float rotation;
                 _rotationVector = new Vector3(0, direction, 0);
@@ -176,6 +175,7 @@ namespace OmniRobot
 
         public void Rotate(float degrees)
         {
+            IsRotationCoroutineActive = true;
             StartCoroutine(RotateCoroutine(degrees));
         }
 
