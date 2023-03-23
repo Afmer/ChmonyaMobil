@@ -7,6 +7,7 @@ namespace OmniRobot
 {
     public abstract class MovePoint : MonoBehaviour
     {
+        [SerializeField] public bool IsMoveWithRotation = true;
         protected Vector3 _targetPosition { get; private set; }
         public bool IsMovingToPoint { get; private set; } = false;
         [SerializeField] protected MovementLogic _movementLogic;
@@ -36,51 +37,82 @@ namespace OmniRobot
             {
                 IsMovingToPoint= true;
                 _targetPosition = target;
-                var tempTargetVectorLocal = transform.InverseTransformVector(new Vector3(_targetVector.x, 0, _targetVector.y));
-                var targetDirectionLocal = new Vector2(tempTargetVectorLocal.x, tempTargetVectorLocal.z);
-                var forwardDirectionLocal = new Vector2(0, 1);
-                var angle = GetAngleDegreesBetweenVectors(targetDirectionLocal, forwardDirectionLocal);
-                if (targetDirectionLocal.x < 0)
-                    angle *= -1;
-                //var angle = RadiansToDegrees(Mathf.Atan((TargetVector.x - _forwardDirectionVector.x) / (TargetVector.y - _forwardDirectionVector.y)));
-                _movementLogic.Rotate(angle);
-                float acceleration = _movementLogic.Strength / _movementLogic.Mass;
-                float brakeAcceleration = _movementLogic.FrictionCoef * 9.8f;
-                float timeForAcceleration = _movementLogic.MaxSpeed / acceleration;
-                float timeBrake = _movementLogic.MaxSpeed / brakeAcceleration;
-                float accelerationPath = (acceleration * timeForAcceleration * timeForAcceleration) / 2;
-                float brakePath = _movementLogic.MaxSpeed * timeBrake + ((brakeAcceleration * timeBrake * timeBrake) / 2);
-                float path = _targetVector.magnitude;
-                path -= (accelerationPath + brakePath);
-                if (path >= 0)
-                {
-                    float time = path / _movementLogic.MaxSpeed;
-                    float activeTime = timeForAcceleration + time;
-                    StartCoroutine(WaitingRotation(activeTime));
-                }
+                if (IsMoveWithRotation)
+                    MoveWithRotation();
                 else
-                {
-                    StartCoroutine(WaitingRotation());
-                }
+                    MoveWithoutRotation();
             }
             else throw new Exception("Move is active");
         }
 
-        private IEnumerator MoveCoroutine(float time)
+        private void MoveWithRotation()
+        {
+            var tempTargetVectorLocal = transform.InverseTransformVector(new Vector3(_targetVector.x, 0, _targetVector.y));
+            var targetDirectionLocal = new Vector2(tempTargetVectorLocal.x, tempTargetVectorLocal.z);
+            var forwardDirectionLocal = new Vector2(0, 1);
+            var angle = GetAngleDegreesBetweenVectors(targetDirectionLocal, forwardDirectionLocal);
+            if (targetDirectionLocal.x < 0)
+                angle *= -1;
+            //var angle = RadiansToDegrees(Mathf.Atan((TargetVector.x - _forwardDirectionVector.x) / (TargetVector.y - _forwardDirectionVector.y)));
+            _movementLogic.Rotate(angle);
+            float acceleration = _movementLogic.Strength / _movementLogic.Mass;
+            float brakeAcceleration = _movementLogic.FrictionCoef * 9.8f;
+            float timeForAcceleration = _movementLogic.MaxSpeed / acceleration;
+            float timeBrake = _movementLogic.MaxSpeed / brakeAcceleration;
+            float accelerationPath = (acceleration * timeForAcceleration * timeForAcceleration) / 2;
+            float brakePath = _movementLogic.MaxSpeed * timeBrake + ((brakeAcceleration * timeBrake * timeBrake) / 2);
+            float path = _targetVector.magnitude;
+            path -= (accelerationPath + brakePath);
+            if (path >= 0)
+            {
+                float time = path / _movementLogic.MaxSpeed;
+                float activeTime = timeForAcceleration + time;
+                StartCoroutine(WaitingRotation(activeTime, new Vector3(0, 0, 1)));
+            }
+            else
+            {
+                StartCoroutine(WaitingRotation(new Vector3(0, 0, 1)));
+            }
+        }
+
+        private void MoveWithoutRotation()
+        {
+            var targetVectorLocal = transform.InverseTransformVector(new Vector3(_targetVector.x, 0, _targetVector.y));
+            float acceleration = _movementLogic.Strength / _movementLogic.Mass;
+            float brakeAcceleration = _movementLogic.FrictionCoef * 9.8f;
+            float timeForAcceleration = _movementLogic.MaxSpeed / acceleration;
+            float timeBrake = _movementLogic.MaxSpeed / brakeAcceleration;
+            float accelerationPath = (acceleration * timeForAcceleration * timeForAcceleration) / 2;
+            float brakePath = _movementLogic.MaxSpeed * timeBrake + ((brakeAcceleration * timeBrake * timeBrake) / 2);
+            float path = _targetVector.magnitude;
+            path -= (accelerationPath + brakePath);
+            if (path >= 0)
+            {
+                float time = path / _movementLogic.MaxSpeed;
+                float activeTime = timeForAcceleration + time;
+                StartCoroutine(MoveCoroutine(activeTime, targetVectorLocal));
+            }
+            else
+            {
+                StartCoroutine(ShortMoveCoroutine(targetVectorLocal));
+            }
+        }
+
+        private IEnumerator MoveCoroutine(float time, Vector3 direction)
         {
             float currentTime = 0;
             while (currentTime < time)
             {
                 yield return null;
                 currentTime += Time.deltaTime;
-                _movementLogic.StrengthDirection = new Vector3(0, 0, 1);
+                _movementLogic.StrengthDirection = direction.normalized;
             }
             _movementLogic.StrengthDirection = new Vector3(0, 0, 0);
             IsMovingToPoint = false;
             yield break;
         }
 
-        private IEnumerator ShortMoveCoroutine()
+        private IEnumerator ShortMoveCoroutine(Vector3 direction)
         {
             float residualPath = _targetVector.magnitude;
             float brakeAcceleration = _movementLogic.FrictionCoef * 9.8f;
@@ -93,7 +125,7 @@ namespace OmniRobot
             while (!isNeedToStop())
             {
                 yield return null;
-                _movementLogic.StrengthDirection = new Vector3(0, 0, 1);
+                _movementLogic.StrengthDirection = direction.normalized;
                 residualPath -= _movementLogic.SpeedVector.magnitude * Time.deltaTime;
             }
             _movementLogic.StrengthDirection = new Vector3(0, 0, 0);
@@ -101,25 +133,25 @@ namespace OmniRobot
             yield break;
         }
 
-        private IEnumerator WaitingRotation(float activeTime)
+        private IEnumerator WaitingRotation(float activeTime, Vector3 direction)
         {
             while (true)
             {
                 if (!_movementLogic.IsRotationCoroutineActive)
                 {
-                    StartCoroutine(MoveCoroutine(activeTime));
+                    StartCoroutine(MoveCoroutine(activeTime, direction));
                     yield break;
                 }
                 yield return null;
             }
         }
-        private IEnumerator WaitingRotation()
+        private IEnumerator WaitingRotation(Vector3 direction)
         {
             while (true)
             {
                 if (!_movementLogic.IsRotationCoroutineActive)
                 {
-                    StartCoroutine(ShortMoveCoroutine());
+                    StartCoroutine(ShortMoveCoroutine(direction));
                     yield break;
                 }
                 yield return null;
