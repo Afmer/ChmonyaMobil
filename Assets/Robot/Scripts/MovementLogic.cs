@@ -93,44 +93,11 @@ namespace OmniRobot
             }
             else
             {
-                SpeedVector += _vectorAcceleration * Time.deltaTime;
+                if ((SpeedVector + _vectorAcceleration * Time.deltaTime).magnitude < MaxSpeed)
+                    SpeedVector += _vectorAcceleration * Time.deltaTime;
                 float tempX;
                 float tempY;
                 float tempZ;
-                if (Mathf.Abs(SpeedVector.x) > MaxSpeed)
-                {
-                    if (SpeedVector.x > 0)
-                        tempX = MaxSpeed;
-                    else
-                        tempX = -MaxSpeed;
-                }
-                else
-                {
-                    tempX = SpeedVector.x;
-                }
-                if (Mathf.Abs(SpeedVector.y) > MaxSpeed)
-                {
-                    if (SpeedVector.y > 0)
-                        tempY = MaxSpeed;
-                    else
-                        tempY = -MaxSpeed;
-                }
-                else
-                {
-                    tempY = SpeedVector.y;
-                }
-                if (Mathf.Abs(SpeedVector.z) > MaxSpeed)
-                {
-                    if (SpeedVector.z > 0)
-                        tempZ = MaxSpeed;
-                    else
-                        tempZ = -MaxSpeed;
-                }
-                else
-                {
-                    tempZ = SpeedVector.z;
-                }
-                SpeedVector = new Vector3(tempX, tempY, tempZ);
             }
             transform.Translate(SpeedVector * Time.deltaTime);
             //_rb.AddRelativeForce(SpeedVector);
