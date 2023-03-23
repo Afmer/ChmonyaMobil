@@ -1,18 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Kilosoft.Tools;
+using OmniRobot;
 
-public class MoveToPointController : MonoBehaviour
+public class MoveToPointController : MovePoint
 {
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField] private Transform _point;
+    [EditorButton("Move")]
+    public void Move()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        MoveToPoint(_point.position);
+        //_movementLogic.StrengthDirection = new Vector3(2.375f, 0, 1);
     }
 }
