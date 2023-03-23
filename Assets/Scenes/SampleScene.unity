@@ -779,6 +779,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: deeda5fd698e18347b49d2151870b758, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsMoveWithRotation: 0
   _movementLogic: {fileID: 1846107469}
   _step: 0.05
   _bezierLine: {fileID: 481092486}
