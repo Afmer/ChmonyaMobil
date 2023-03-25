@@ -4,8 +4,6 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using static UnityEngine.GraphicsBuffer;
 
-//эта строчка гарантирует что наш скрипт не завалится 
-//ести на плеере будет отсутствовать компонент Rigidbody
 namespace OmniRobot
 {
     [RequireComponent(typeof(Rigidbody))]
@@ -67,9 +65,6 @@ namespace OmniRobot
             _rb = GetComponent<Rigidbody>();
 
         }
-
-        // обратите внимание что все действия с физикой 
-        // необходимо обрабатывать в FixedUpdate, а не в Update
         void FixedUpdate()
         {
             MovementLogicFunc();
@@ -97,12 +92,8 @@ namespace OmniRobot
             {
                 if ((SpeedVector + _vectorAcceleration * Time.deltaTime).magnitude < MaxSpeed)
                     SpeedVector += _vectorAcceleration * Time.deltaTime;
-                float tempX;
-                float tempY;
-                float tempZ;
             }
             transform.Translate(SpeedVector * Time.deltaTime);
-            //_rb.AddRelativeForce(SpeedVector);
         }
 
         private IEnumerator RotateCoroutine(float degrees)
