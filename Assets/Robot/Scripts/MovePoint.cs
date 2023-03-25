@@ -66,7 +66,6 @@ namespace OmniRobot
 
         private void MoveWithoutRotation()
         {
-            var targetVectorLocal = transform.InverseTransformVector(new Vector3(_targetVector.x, 0, _targetVector.y));
             StartCoroutine(ShortMoveCoroutine());
         }
 
