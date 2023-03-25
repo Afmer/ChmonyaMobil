@@ -10,6 +10,7 @@ namespace OmniRobot
         [SerializeField] public bool IsMoveWithRotation = true;
         protected Vector3 _targetPosition { get; private set; }
         public bool IsMovingToPoint { get; private set; } = false;
+        public bool IsWaitingStop = false;
         [SerializeField] protected MovementLogic _movementLogic;
         protected Vector2 _targetVector
         {
@@ -87,8 +88,9 @@ namespace OmniRobot
                 _movementLogic.StrengthDirection = transform.InverseTransformVector(directionVectorTemp.normalized);
             }
             _movementLogic.StrengthDirection = new Vector3(0, 0, 0);
-            while (_movementLogic.SpeedVector.magnitude != 0)
-                yield return null;
+            if (IsWaitingStop)
+                while (_movementLogic.SpeedVector.magnitude != 0)
+                    yield return null;
             IsMovingToPoint = false;
             yield break;
         }
