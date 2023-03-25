@@ -26,6 +26,12 @@ namespace OmniRobot
             return RadiansToDegrees(Mathf.Acos(cos));
         }
 
+        private float GetAngleRadiansBetweenVectors(Vector2 direction, Vector2 targetVector)
+        {
+            var cos = (direction.x * targetVector.x + direction.y * targetVector.y) / (direction.magnitude * targetVector.magnitude);
+            return cos;
+        }
+
         protected float RadiansToDegrees(float radians)
         {
             return radians * 57.2956f;
@@ -54,30 +60,31 @@ namespace OmniRobot
             if (targetDirectionLocal.x < 0)
                 angle *= -1;
             _movementLogic.Rotate(angle);
-            StartCoroutine(WaitingRotation(new Vector3(0, 0, 1)));
+            StartCoroutine(WaitingRotation());
         }
 
         private void MoveWithoutRotation()
         {
             var targetVectorLocal = transform.InverseTransformVector(new Vector3(_targetVector.x, 0, _targetVector.y));
-            StartCoroutine(ShortMoveCoroutine(targetVectorLocal));
+            StartCoroutine(ShortMoveCoroutine());
         }
 
-        private IEnumerator ShortMoveCoroutine(Vector3 direction)
+        private IEnumerator ShortMoveCoroutine()
         {
-            float residualPath = _targetVector.magnitude;
             float brakeAcceleration = _movementLogic.FrictionCoef * 9.8f;
             Func<bool> isNeedToStop = () =>
             {
                 float time = _movementLogic.SpeedVector.magnitude / (brakeAcceleration);
-                bool result = (_movementLogic.SpeedVector.magnitude * time) - ((brakeAcceleration * Mathf.Pow(time, 2)) / 2) >= residualPath;
+                bool result = (_movementLogic.SpeedVector.magnitude * time) - ((brakeAcceleration * Mathf.Pow(time, 2)) / 2) >= _targetVector.magnitude;
                 return result;
             };
             while (!isNeedToStop())
             {
                 yield return null;
-                _movementLogic.StrengthDirection = direction.normalized;
-                residualPath -= _movementLogic.SpeedVector.magnitude * Time.deltaTime;
+                Debug.DrawLine(transform.position, _targetPosition, Color.red);
+                var angleBetweenSpeedAndStrength = GetAngleRadiansBetweenVectors(_movementLogic.SpeedVector, _movementLogic.StrengthDirection);
+                Vector3 directionVectorTemp = new Vector3(_targetVector.x, 0, _targetVector.y);
+                _movementLogic.StrengthDirection = transform.InverseTransformVector(directionVectorTemp.normalized);
             }
             _movementLogic.StrengthDirection = new Vector3(0, 0, 0);
             while (_movementLogic.SpeedVector.magnitude != 0)
@@ -85,13 +92,13 @@ namespace OmniRobot
             IsMovingToPoint = false;
             yield break;
         }
-        private IEnumerator WaitingRotation(Vector3 direction)
+        private IEnumerator WaitingRotation()
         {
             while (true)
             {
                 if (!_movementLogic.IsRotationCoroutineActive)
                 {
-                    StartCoroutine(ShortMoveCoroutine(direction));
+                    StartCoroutine(ShortMoveCoroutine());
                     yield break;
                 }
                 yield return null;
