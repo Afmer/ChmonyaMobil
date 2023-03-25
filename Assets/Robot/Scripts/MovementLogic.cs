@@ -17,6 +17,7 @@ namespace OmniRobot
         public float AngleSpeed = 10f;
         public float FrictionCoef = 0.5f;
         public float MaxSpeed;
+        public float AccuracyVelocityAndForceDirection = 0.1f;
         public float Mass
         {
             get
@@ -79,7 +80,8 @@ namespace OmniRobot
         private void MovementLogicFunc()
         {
             _vectorAcceleration = _strengthVector / _rb.mass;
-            if (_strengthVector.magnitude == 0)
+            bool IsSpeedAndStrengthDirectionsSame = Mathf.Abs((SpeedVector.normalized - _strengthVector.normalized).magnitude) > AccuracyVelocityAndForceDirection;
+            if (_strengthVector.magnitude == 0 || (SpeedVector.magnitude != 0 && IsSpeedAndStrengthDirectionsSame))
             {
                 var frictionStrength = FrictionCoef * _rb.mass * 9.8f;
                 var frictionAcceleration = Vector3.Normalize(SpeedVector) * -1 * frictionStrength / _rb.mass;
