@@ -8,7 +8,7 @@ namespace OmniRobot
 {
     public class MoveBezierController : MovePoint
     {
-        [SerializeField][Range(0, 1)] private float _step;
+        [SerializeField][Range(0.00001f, 1)] private float _step = 0.1f;
         public BezierLine BezierLine
         {
             get
