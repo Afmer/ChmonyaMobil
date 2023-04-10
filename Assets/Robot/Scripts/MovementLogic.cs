@@ -76,11 +76,18 @@ namespace OmniRobot
         {
             _vectorAcceleration = _strengthVector / _rb.mass;
             bool IsSpeedAndStrengthDirectionsSame = Mathf.Abs((SpeedVector.normalized - _strengthVector.normalized).magnitude) <= AccuracyVelocityAndForceDirection;
+            var angleSpeedBetweenStrength = GetAngleDegreesBetweenVectors(new Vector2(SpeedVector.normalized.x, SpeedVector.normalized.z), new Vector2(_strengthVector.normalized.x, _strengthVector.normalized.z));
+            Debug.Log(angleSpeedBetweenStrength);
             if (_strengthVector.magnitude == 0 || (SpeedVector.magnitude != 0 && !IsSpeedAndStrengthDirectionsSame))
             {
                 var frictionStrength = FrictionCoef * _rb.mass * 9.8f;
                 var frictionAcceleration = Vector3.Normalize(SpeedVector) * -1 * frictionStrength / _rb.mass;
-                var tempSpeedVector = SpeedVector + frictionAcceleration * Time.deltaTime;
+                
+                Vector3 tempSpeedVector;
+                if (_strengthVector.magnitude != 0)
+                    tempSpeedVector = SpeedVector + frictionAcceleration * Time.deltaTime * (angleSpeedBetweenStrength / 180);
+                else
+                    tempSpeedVector = SpeedVector + frictionAcceleration * Time.deltaTime;
                 if (Vector3.Normalize(tempSpeedVector) == Vector3.Normalize(SpeedVector))
                 {
                     SpeedVector = tempSpeedVector;
@@ -94,6 +101,17 @@ namespace OmniRobot
                     SpeedVector += _vectorAcceleration * Time.deltaTime;
             }
             transform.Translate(SpeedVector * Time.deltaTime);
+        }
+
+        private float GetAngleDegreesBetweenVectors(Vector2 direction, Vector2 targetVector)
+        {
+            var cos = (direction.x * targetVector.x + direction.y * targetVector.y) / (direction.magnitude * targetVector.magnitude);
+            return RadiansToDegrees(Mathf.Acos(cos));
+        }
+
+        protected float RadiansToDegrees(float radians)
+        {
+            return radians * 57.2956f;
         }
 
         private IEnumerator RotateCoroutine(float degrees)
