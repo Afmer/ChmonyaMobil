@@ -3989,6 +3989,10 @@ PrefabInstance:
       propertyPath: MaxSpeed
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 897866570395111753, guid: 0400039e23c9a444bb7102ac8fe0bb60, type: 3}
+      propertyPath: AngleSpeed
+      value: 45
+      objectReference: {fileID: 0}
     - target: {fileID: 897866570395111755, guid: 0400039e23c9a444bb7102ac8fe0bb60, type: 3}
       propertyPath: _bezierLine
       value: 
@@ -4041,5 +4045,17 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2755187511542328985, guid: 0400039e23c9a444bb7102ac8fe0bb60, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 4bce48a1ae05ed14687d2347591309f3, type: 2}
+    - target: {fileID: 3746326014789490662, guid: 0400039e23c9a444bb7102ac8fe0bb60, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 4bce48a1ae05ed14687d2347591309f3, type: 2}
+    - target: {fileID: 5401441325750634608, guid: 0400039e23c9a444bb7102ac8fe0bb60, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 4bce48a1ae05ed14687d2347591309f3, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0400039e23c9a444bb7102ac8fe0bb60, type: 3}
